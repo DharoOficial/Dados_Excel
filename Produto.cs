@@ -12,7 +12,12 @@ namespace CriarDadosExel_27
         private const string PATH = "Database/produto.csv";
 
         public Produto()
-        {
+        {   
+            string pasta = PATH.Split('/')[0];
+            if(!Directory.Exists(pasta)){
+                Directory.CreateDirectory(pasta);
+            }
+
             if(!File.Exists(PATH))
             {
                 File.Create(PATH).Close();
@@ -28,7 +33,7 @@ namespace CriarDadosExel_27
 
         private string PrepararLinhaCSV ( Produto prod )
         {
-            return $"codigo= {prod.codigo}; nome= {prod.nome}; preco{prod.preco}";
+            return $"codigo= {prod.codigo}; nome= {prod.nome}; preço= R${prod.preco}.";
         }
         
         

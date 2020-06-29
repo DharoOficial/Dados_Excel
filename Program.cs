@@ -14,31 +14,14 @@ namespace CriarDadosExel_27
             p.preco = 299 ;
             p.inserir(p);
 
+            Produto p1 = new Produto();
+            p1.codigo = 2;
+            p1.nome = "Lamborga";
+            p1.preco = 3000000 ;
+            p1.inserir(p1);
 
-            string path = @"Database";
 
-        try
-        {
-            // Determine whether the directory exists.
-            if (Directory.Exists(path))
-            {
-                Console.WriteLine("That path exists already.");
-                return;
-            }
-
-            // Try to create the directory.
-            DirectoryInfo di = Directory.CreateDirectory(path);
-            Console.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
-
-           
             
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("The process failed: {0}", e.ToString());
-        }
-        finally {}
-
         }
             
     }

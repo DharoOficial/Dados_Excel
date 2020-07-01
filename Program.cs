@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Text;
+using System.Collections.Generic;
 
 namespace CriarDadosExel_27
 {
@@ -20,8 +22,9 @@ namespace CriarDadosExel_27
             p1.preco = 3000000 ;
             p1.inserir(p1);
 
-
-            
+            TextReader textReader = new StreamReader("produto.csv");
+            Console.WriteLine(textReader.ReadLine());
+            textReader.Close();
         }
             
     }

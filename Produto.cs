@@ -7,77 +7,161 @@ namespace CriarDadosExel_27
 {
     public class Produto
     {
-        public int codigo { get; set; }
-        public string nome { get; set; }
-        public float preco { get; set; }
+        public int Codigo { get; set; }
+        public string Nome { get; set; }
+        public float Preco { get; set; }
 
-        
+        private const string PATH = "Database/produto.csv";
 
         public Produto()
-        {   
-            string pasta = @"C:\Users\mercatudo\Documents\site\CriarDadosExel_27\produto.csv".Split('/')[0];
+        {
+            // ------------------------------------------------
+            // Solução do desafio
+            string pasta = PATH.Split('/')[0];
+
             if(!Directory.Exists(pasta)){
                 Directory.CreateDirectory(pasta);
             }
+            // ------------------------------------------------
 
-            if(!File.Exists(@"C:\Users\mercatudo\Documents\site\CriarDadosExel_27\produto.csv"))
+            if(!File.Exists(PATH))
             {
-                File.Create(@"C:\Users\mercatudo\Documents\site\CriarDadosExel_27\produto.csv").Close();
+                File.Create(PATH).Close();
             }
-
         }
 
-        public void inserir(Produto p)
+        /// <summary>
+        /// Cadastra um produto
+        /// </summary>
+        /// <param name="prod">Objeto Produto</param>
+        public void Cadastrar(Produto prod)
         {
-            string[] linha = new string[]{p.PrepararLinhaCSV(p) };
-            File.AppendAllLines(@"C:\Users\mercatudo\Documents\site\CriarDadosExel_27\produto.csv", linha);
-
-            
-        }
-        private string PrepararLinhaCSV ( Produto prod )
-        {
-            return $"codigo= {prod.codigo}; nome= {prod.nome}; preço= R${prod.preco}.";
+            var linha = new string[] { PrepararLinha(prod) };
+            File.AppendAllLines(PATH, linha);
         }
 
+        /// <summary>
+        /// Lê o csv 
+        /// </summary>
+        /// <returns>Lista de produtos</returns>
         public List<Produto> Ler()
         {
+            // Criamos uma lista que servirá como nosso retorno
             List<Produto> produtos = new List<Produto>();
 
-            string[] linhas  = File.ReadAllLines(@"C:\Users\mercatudo\Documents\site\CriarDadosExel_27\produto.csv");
-        
-            foreach(var linha in linhas)
-            {
-                string[] dados = linha.Split(";");
-                Produto prod = new Produto();
+            // Lemos o arquivo e transformamos em um array de linhas
+            // [0] = codigo=1;nome=Gibson;preco=7500
+            // [1] = codigo=1;nome=Fender;preco=7500 
+            string[] linhas = File.ReadAllLines(PATH);
 
-                prod.codigo = Int32.Parse((dados[0]));
-                prod.nome = (dados[1]); 
-                prod.preco = float.Parse(dados[2] );
-                produtos.Add(prod);
+            foreach(string linha in linhas){
+                
+                // Separamos os dados de cada linha com Split
+                // [0] = codigo=1
+                // [1] = nome=Gibson
+                // [2] = preco=7500
+                string[] dado = linha.Split(";");
+
+                // Criamos instâncias de produtos para serem colocados na lista
+                Produto p   = new Produto();
+                p.Codigo    = Int32.Parse( Separar(dado[0]) );
+                p.Nome      = Separar(dado[1]);
+                p.Preco     = float.Parse( Separar(dado[2]) );
+
+                produtos.Add(p);
             }
-            return produtos;
-        }
-        
 
-        public void Remove(string _termo)
-        {
-            List<string> lines = new List<string>();
-            using(StreamReader file = new StreamReader(@"C:\Users\mercatudo\Documents\site\CriarDadosExel_27\produto.csv"))
+            produtos = produtos.OrderBy(y => y.Nome).ToList();
+            return produtos; 
+        }
+
+        /// <summary>
+        /// Remove uma ou mais linhas que contenham o termo
+        /// </summary>
+        /// <param name="_termo">termo para ser buscado</param>
+        public void Remover(string _termo){
+
+            // Criamos uma lista que servirá como uma espécie de backup para as linhas do csv
+            List<string> linhas = new List<string>();
+
+            // Utilizamos a bliblioteca StreamReader para ler nosso .csv
+            using(StreamReader arquivo = new StreamReader(PATH))
             {
-                string line;
-                while((line = file.ReadLine()) != null)
+                string linha;
+                while((linha = arquivo.ReadLine()) != null)
                 {
-                    lines.Add(line);
+                    linhas.Add(linha);
                 }
-                lines.RemoveAll(l => l.Contains(_termo));
             }
+
+            // Removemos as linhas que tiverem o termo passado como argumento
+            // codigo=1;nome=Tagima;preco=7500
+            // Tagima 
+            linhas.RemoveAll(l => l.Contains(_termo));
+
+            // Reescrevemos nosso csv do zero
+            ReescreverCSV(linhas);
         }
-    
-       
-
-
-
-            
         
+        /// <summary>
+        /// Altera um produto
+        /// </summary>
+        /// <param name="_produtoAlterado">Objeto de Produto</param>
+        public void Alterar(Produto _produtoAlterado){
+
+            // Criamos uma lista que servirá como uma espécie de backup para as linhas do csv
+            List<string> linhas = new List<string>();
+
+            // Utilizamos a bliblioteca StreamReader para ler nosso .csv
+            using(StreamReader arquivo = new StreamReader(PATH))
+            {
+                string linha;
+                while((linha = arquivo.ReadLine()) != null)
+                {
+                    linhas.Add(linha);
+                }
+            }
+            // codigo=2;nome=Ibanez;preco=7500
+            linhas.RemoveAll(z => z.Split(";")[0].Contains(_produtoAlterado.Codigo.ToString()));
+            
+            // codigo= 2; nome=Ibanez;preco=7500
+            //linhas.RemoveAll(z => z.Split(";")[0].split[1] == _produtoAlterado.Codigo.ToString());
+
+            // Adicionamos a linha alterada na lista de backup
+            linhas.Add( PrepararLinha(_produtoAlterado) );
+
+            // Reescrevemos nosso csv do zero
+            ReescreverCSV(linhas);         
+        }
+
+
+        private void ReescreverCSV(List<string> lines){
+            // Reescrevemos nosso csv do zero
+            using(StreamWriter output = new StreamWriter(PATH))
+            {
+                foreach(string ln in lines)
+                {
+                    output.Write(ln + "\n");
+                }
+            }   
+        }
+
+        public List<Produto> Filtrar(string _nome)
+        {
+            return Ler().FindAll(x => x.Nome == _nome);
+        }
+
+        private string Separar(string _coluna)
+        {
+            // 0      1
+            // nome = Gibson
+            return _coluna.Split("=")[1];
+        }
+
+        // 1;Celular;600
+        private string PrepararLinha(Produto p)
+        {
+            return $"codigo = {p.Codigo} ; nome = {p.Nome} ; preco = {p.Preco}";
+        }
     }
 }

@@ -7,26 +7,32 @@ namespace CriarDadosExel_27
 {
     class Program
     {
-
         static void Main(string[] args)
         {
-            Produto p = new Produto();
-            p.codigo = 1;
-            p.nome = "2077";
-            p.preco = 299 ;
-            p.inserir(p);
 
             Produto p1 = new Produto();
-            p1.codigo = 2;
-            p1.nome = "Lamborga";
-            p1.preco = 3000000 ;
-            p1.inserir(p1);
+            p1.Codigo = 1;
+            p1.Nome = "Tagima";
+            p1.Preco = 7500f;
 
-            TextReader textReader = new StreamReader("produto.csv");
-            Console.WriteLine(textReader.ReadLine());
-            textReader.Close();
+            p1.Cadastrar(p1);
+            p1.Remover("Tagima");
+
+            Produto alterado = new Produto();
+            alterado.Codigo = 2;
+            alterado.Nome = "ESP";
+            alterado.Preco = 126000f;
+
+            p1.Alterar(alterado);
+
+            List<Produto> lista = p1.Ler();
+
+            foreach(Produto item in lista)
+            {
+                Console.WriteLine($"R$ {item.Preco} - {item.Nome}");
+            }
+
         }
-            
     }
 }
 
